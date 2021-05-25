@@ -7,7 +7,8 @@ object Dependencies {
     val catsEffect = "3.1.1"
     val collectionCompat = "2.4.4"
     val commonsCodec = "1.15"
-    val circe = "0.13.0"
+    val circe = "0.14.0-M7"
+    val circeGenericExtras = "0.13.0"
     val circeYaml = "0.13.1"
     val decline = "2.0.0"
     val embeddedRedis = "0.7.3"
@@ -16,7 +17,7 @@ object Dependencies {
     val googleCredentials = "0.26.0"
     val googleCloudTrace = "1.3.4"
     val grpc = "1.38.0"
-    val http4s = "1.0.0-M21"
+    val http4s = "1.0.0-M22"
     val http4sJdkClient = "0.5.0-M4"
     val jaeger = "1.6.0"
     val jwt = "3.16.0"
@@ -31,6 +32,7 @@ object Dependencies {
     val scaffeine = "4.0.2"
     val scala212 = "2.12.13"
     val scala213 = "2.13.6"
+    val scala3 = "3.0.0"
     val scalapb = "0.11.0"
     val sttpClient3 = "3.3.5"
     val sttpModel = "1.4.7"
@@ -39,7 +41,7 @@ object Dependencies {
     val vulcan = "1.7.1"
     val zioInterop = "3.1.1.0"
 
-    val catsTestkitScalatest = "2.1.4"
+    val catsTestkitScalatest = "2.1.5"
     val disciplineScalatest = "2.1.5"
     val discipline = "1.1.5"
     val scalaCheck = "1.15.4"
@@ -54,7 +56,7 @@ object Dependencies {
   lazy val catsEffect = "org.typelevel"                        %% "cats-effect"                     % Versions.catsEffect
   lazy val commonsCodec = "commons-codec"                       % "commons-codec"                   % Versions.commonsCodec
   lazy val collectionCompat = "org.scala-lang.modules"         %% "scala-collection-compat"         % Versions.collectionCompat
-  lazy val circeGeneric = "io.circe"                           %% "circe-generic-extras"            % Versions.circe
+  lazy val circeGenericExtras = "io.circe"                     %% "circe-generic-extras"            % Versions.circeGenericExtras
   lazy val circeParser = "io.circe"                            %% "circe-parser"                    % Versions.circe
   lazy val circeYaml = "io.circe"                              %% "circe-yaml"                      % Versions.circeYaml
   lazy val embeddedKafka = "io.github.embeddedkafka"           %% "embedded-kafka"                  % Versions.kafka
@@ -123,7 +125,7 @@ object Dependencies {
       disciplineScalatest,
       disciplineCore,
       scalacheck,
-      scalacheckShapeless,
+      //scalacheckShapeless,
       scalaTest
     )
 }

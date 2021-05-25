@@ -16,15 +16,22 @@ lazy val commonSettings = Seq(
     ScmInfo(url("https://github.com/janstenpickle/trace4cats"), "scm:git:git@github.com:janstenpickle/trace4cats.git")
   ),
   Compile / compile / javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
-  addCompilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1"),
-  addCompilerPlugin(("org.typelevel" %% "kind-projector" % "0.13.0").cross(CrossVersion.patch)),
+  libraryDependencies ++= (CrossVersion.partialVersion(scalaVersion.value) match {
+    case Some((2, _)) =>
+      List(
+        compilerPlugin(("org.typelevel" %% "kind-projector" % "0.13.0").cross(CrossVersion.full)),
+        compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")
+      )
+    case _ => Nil
+  }),
   libraryDependencies ++= Seq(Dependencies.cats, Dependencies.collectionCompat),
   scalacOptions := {
     val opts = scalacOptions.value :+ "-Wconf:src=src_managed/.*:s,any:wv"
 
     CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2, 12)) => opts.filterNot(Set("-Xfatal-warnings"))
-      case _ => opts
+      case Some((2, 13)) => opts
+      case _ => List("-Ykind-projector")
     }
   },
   Test / fork := true,
@@ -34,7 +41,11 @@ lazy val commonSettings = Seq(
   releaseEarlyEnableSyncToMaven := true,
   pgpPublicRing := file("./.github/git adlocal.pubring.asc"),
   pgpSecretRing := file("./.github/local.secring.asc"),
-  crossScalaVersions := Seq(Dependencies.Versions.scala213, Dependencies.Versions.scala212),
+  crossScalaVersions := Seq(
+    Dependencies.Versions.scala213,
+    Dependencies.Versions.scala212,
+    Dependencies.Versions.scala3
+  ),
   resolvers += Resolver.sonatypeRepo("releases"),
   ThisBuild / evictionErrorLevel := Level.Warn
 )
@@ -159,7 +170,7 @@ lazy val model =
       libraryDependencies ++= Seq(
         Dependencies.catsEffectKernel,
         Dependencies.commonsCodec,
-        Dependencies.kittens,
+        //Dependencies.kittens,
         Dependencies.caseInsensitive
       )
     )
@@ -280,7 +291,7 @@ lazy val `jaeger-integration-test` =
       name := "trace4cats-jaeger-integration-test",
       libraryDependencies ++= Dependencies.test,
       libraryDependencies ++= Seq(
-        Dependencies.circeGeneric,
+        Dependencies.circeGenericExtras,
         Dependencies.http4sCirce,
         Dependencies.http4sBlazeClient,
         Dependencies.logback,
@@ -328,7 +339,7 @@ lazy val `opentelemetry-otlp-http-exporter` =
     .settings(
       name := "trace4cats-opentelemetry-otlp-http-exporter",
       libraryDependencies ++= Seq(
-        Dependencies.circeGeneric,
+        Dependencies.circeGenericExtras,
         Dependencies.http4sClient,
         Dependencies.http4sBlazeClient,
         (Dependencies.openTelemetryProto % "protobuf").intransitive(),
@@ -344,7 +355,11 @@ lazy val `zipkin-http-exporter` =
     .settings(publishSettings)
     .settings(
       name := "trace4cats-zipkin-http-exporter",
-      libraryDependencies ++= Seq(Dependencies.circeGeneric, Dependencies.http4sClient, Dependencies.http4sBlazeClient)
+      libraryDependencies ++= Seq(
+        Dependencies.circeGenericExtras,
+        Dependencies.http4sClient,
+        Dependencies.http4sBlazeClient
+      )
     )
     .dependsOn(model, kernel, `exporter-common`, `exporter-http`, `jaeger-integration-test` % "test->compile")
 
@@ -369,7 +384,7 @@ lazy val `stackdriver-http-exporter` =
       name := "trace4cats-stackdriver-http-exporter",
       libraryDependencies ++= Dependencies.test.map(_ % Test),
       libraryDependencies ++= Seq(
-        Dependencies.circeGeneric,
+        Dependencies.circeGenericExtras,
         Dependencies.circeParser,
         Dependencies.http4sClient,
         Dependencies.http4sCirce,
@@ -387,7 +402,7 @@ lazy val `datadog-http-exporter` =
       name := "trace4cats-datadog-http-exporter",
       libraryDependencies ++= Dependencies.test.map(_ % Test),
       libraryDependencies ++= Seq(
-        Dependencies.circeGeneric,
+        Dependencies.circeGenericExtras,
         Dependencies.circeParser,
         Dependencies.http4sClient,
         Dependencies.http4sCirce,
@@ -402,7 +417,7 @@ lazy val `newrelic-http-exporter` =
     .settings(
       name := "trace4cats-newrelic-http-exporter",
       libraryDependencies ++= Seq(
-        Dependencies.circeGeneric,
+        Dependencies.circeGenericExtras,
         Dependencies.circeParser,
         Dependencies.http4sClient,
         Dependencies.http4sCirce,
@@ -573,7 +588,7 @@ lazy val `sttp-tapir` = (project in file("modules/sttp-tapir"))
     name := "trace4cats-sttp-tapir",
     libraryDependencies ++= Seq(Dependencies.sttpTapir),
     libraryDependencies ++= (Dependencies.test ++ Seq(
-      Dependencies.circeGeneric,
+      Dependencies.circeGenericExtras,
       Dependencies.http4sClient,
       Dependencies.sttpTapirJsonCirce,
       //Dependencies.sttpTapirHttp4s
@@ -643,7 +658,7 @@ lazy val `dynamic-sampling-config` = (project in file("modules/dynamic-sampling-
   .settings(publishSettings)
   .settings(
     name := "trace4cats-dynamic-sampling-config",
-    libraryDependencies ++= Seq(Dependencies.kittens),
+    //libraryDependencies ++= Seq(Dependencies.kittens),
     libraryDependencies ++= Dependencies.test.map(_ % Test)
   )
   .dependsOn(model, kernel, `dynamic-sampling`, `rate-sampling`, test % "test->compile")
@@ -653,7 +668,7 @@ lazy val `dynamic-sampling-http4s` = (project in file("modules/dynamic-sampling-
   .settings(
     name := "trace4cats-dynamic-sampling-http4s",
     libraryDependencies ++= Seq(
-      Dependencies.circeGeneric,
+      Dependencies.circeGenericExtras,
       Dependencies.http4sCirce,
       Dependencies.http4sDsl,
       Dependencies.http4sServer
@@ -698,7 +713,7 @@ lazy val `collector-common` = (project in file("modules/collector-common"))
   .settings(
     name := "trace4cats-collector-common",
     libraryDependencies ++= Seq(
-      Dependencies.circeGeneric,
+      Dependencies.circeGenericExtras,
       Dependencies.circeYaml,
       Dependencies.declineEffect,
       Dependencies.http4sJdkClient,

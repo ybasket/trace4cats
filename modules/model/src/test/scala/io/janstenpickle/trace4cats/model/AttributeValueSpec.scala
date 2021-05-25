@@ -11,7 +11,7 @@ class AttributeValueSpec
     extends AnyFunSuite
     with ScalaCheckDrivenPropertyChecks
     with FunSuiteDiscipline
-    with ScalacheckShapeless {
+    /*with ScalacheckShapeless*/ {
 
   implicit def evalArb[A: Arbitrary]: Arbitrary[Eval[A]] = Arbitrary(Arbitrary.arbitrary[A].map(Eval.now))
 

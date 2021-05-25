@@ -3,7 +3,7 @@ package io.janstenpickle.trace4cats.stackdriver.oauth
 import cats.effect.IO
 import cats.effect.testkit.TestInstances
 import org.scalacheck.{Arbitrary, Gen}
-import org.scalacheck.ScalacheckShapeless._
+//import org.scalacheck.ScalacheckShapeless._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
